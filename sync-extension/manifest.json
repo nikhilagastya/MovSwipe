@@ -1,0 +1,12 @@
+{
+    "manifest_version": 3,
+    "name": "Netflix Sync Extension",
+    "version": "1.0",
+    "permissions": ["tabs", "activeTab"],
+    "content_scripts": [
+      {
+        "matches": ["https://www.netflix.com/*"],
+        "js": ["socket.io.min.js", "content.js"]
+      }
+    ]
+  }
