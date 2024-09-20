@@ -24,6 +24,7 @@ io.on('connection', (socket: Socket) => {
   console.log(`New connection established. Socket ID: ${socket.id}`);
 
   // Join room event
+
   socket.on('joinRoom', (roomId: string) => {
     const socketId = socket.id;
     console.log(`Socket ${socketId} is attempting to join room: ${roomId}`);
@@ -31,6 +32,7 @@ io.on('connection', (socket: Socket) => {
     socket.join(roomId);
 
     // Initialize room if not already created
+    console.log(rooms[roomId], "to check if the room is available")
     if (!rooms[roomId]) {
       rooms[roomId] = {
         users: 0,
