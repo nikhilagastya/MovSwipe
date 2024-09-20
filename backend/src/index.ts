@@ -21,20 +21,14 @@ let rooms: Record<string, Room> = {};
 
 // Socket connection handler
 io.on('connection', (socket: Socket) => {
-  console.log(`New connection established. Socket ID: ${socket.id}`);
+  const socketId = socket.id;
+  console.log(`New connection established. Socket ID: ${socketId}`);
 
   // Join room event
-
   socket.on('joinRoom', (roomId: string) => {
-    const socketId = socket.id;
     console.log(`Socket ${socketId} is attempting to join room: ${roomId}`);
 
-
-    if(rooms[roomId]){
-    socket.join(roomId);
-    }
     // Initialize room if not already created
-    console.log(rooms[roomId],rooms, "to check if the room is available")
     if (!rooms[roomId]) {
       rooms[roomId] = {
         users: 0,
@@ -44,6 +38,7 @@ io.on('connection', (socket: Socket) => {
       console.log(`Room ${roomId} created`);
     }
 
+    socket.join(roomId);
     rooms[roomId].users += 1;
     rooms[roomId].usersInRoom.add(socketId);
     console.log(`Socket ${socketId} joined room: ${roomId}`);
@@ -85,6 +80,18 @@ io.on('connection', (socket: Socket) => {
     socket.on('pauseMovie', (roomId) => {
       console.log(`Pause event received in room ${roomId} from user ${socketId}`);
       io.to(roomId).emit('pauseSync');
+    });
+
+    // Handle seeking event
+    socket.on('seekMovie', (data: { roomId: string; time: number }) => {
+      console.log(`Seek event received from user ${socketId} in room ${data.roomId}, new time: ${data.time}`);
+      io.to(data.roomId).emit('seekSync', { time: data.time });
+    });
+
+    // Handle time update event
+    socket.on('timeUpdate', (data: { roomId: string; time: number }) => {
+      console.log(`Time update event received from user ${socketId} in room ${data.roomId}, current time: ${data.time}`);
+      io.to(data.roomId).emit('timeSync', { time: data.time });
     });
 
     // Disconnect event
